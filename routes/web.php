@@ -58,6 +58,36 @@ Route::group(['prefix' => 'staff'], function () {
         'as' => 'register'
     ]);
 
+    Route::get('dashboard', [
+        'uses' => 'userController@dashboard',
+        'as' => 'dashboard'
+    ]);
+
+    Route::get('dashboard/courses/all', [
+        'uses' => 'userController@dashboard',
+        'as' => 'dashboard'
+    ]);
+
+    Route::get('dashboard/courses/new', [
+        'uses' => 'CourseController@getCreate',
+        'as' => 'create-new-course'
+    ]);
+
+    Route::post('dashboard/courses/new', [
+        'uses' => 'CourseController@postCreate',
+        'as' => 'save-new-course'
+    ]);
+
+    Route::get('dashboard/courses/{id}', [
+        'uses' => 'CourseController@show',
+        'as' => 'course-show'
+    ]);
+
+    Route::get('dashboard/courses/{id}/delete', [
+        'uses' => 'CourseController@delete',
+        'as' => 'course-delete'
+    ]);
+
 });
 
 

@@ -26,15 +26,14 @@ class StudentController extends Controller
         //retrieve student with that matric No from the cits databse
         $student = CitsStudent::where('matricNo', '=', Request('matricNo'))->first();
 
-        if(($student != null) & ($this->validatePassword(Request('password'), $student->password) == true)){
-            $courseIds = $this->getCourseIds(explode(',', $student->courses));
+        if(($student != null)){
+            $courseIds = Course::getCourseIds(explode(',', $student->courses));
             session([
                 'matricNo' => request()->input('matricNo'),
-                'password' => request()->input('password'),
                 'courses' => $courseIds,
             ]);
 
-            $courses = $this->getCourses($courseIds);
+            $courses = Course::getCourses($courseIds);
 
             return view('register', compact('courses', 'student'));
         }
@@ -50,7 +49,7 @@ class StudentController extends Controller
                 ['matricNo', '=', session('matricNo')],
             ])->first();
 
-        if ((session('matricNo')) && (session('password')) && (session('courses')) && ($student == null)) {
+        if ((session('matricNo')) && (session('courses')) && ($student == null)) {
             
             $courses = [];
             $sessionCourses = session('courses');
@@ -62,7 +61,6 @@ class StudentController extends Controller
 
             $student = Student::create([
                         'matricNo' => session('matricNo'),
-                        'password' => bcrypt(session('password')),
                         'courses' => json_encode($courses),
                     ]); 
             dd($student->courses);
@@ -90,28 +88,4 @@ class StudentController extends Controller
         }
     }
 
-    public function getCourseIds($courseCodes){
-        
-        $courseIds = [];
-
-        foreach($courseCodes as $courseCode) {
-           $course = Course::where('courseCode', '=', $courseCode)->first();
-           array_push($courseIds, $course->id);
-        }
-
-        return $courseIds;
-    }
-
-
-    public function getCourses($courseIds){
-        
-        $courses = [];
-
-        foreach($courseIds as $courseId) {
-           $course = Course::where('id', '=', $courseId)->first();
-           array_push($courses, $course);
-        }
-
-        return $courses;
-    }
 }

@@ -16,7 +16,6 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->increments('id');
             $table->string('matricNo');
-            $table->string('password');
             $table->string('courses'); // cron job updates this from the cits database -- courseId=>noofatt
             $table->rememberToken();
             $table->timestamps();

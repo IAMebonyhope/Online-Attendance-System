@@ -26,4 +26,41 @@ class Course extends Authenticatable
     protected $hidden = [
         
     ];
+
+    public static function getCourseIds($courseCodes){
+        
+        $courseIds = [];
+
+        foreach($courseCodes as $courseCode) {
+           $course = self::where('courseCode', '=', $courseCode)->first();
+           array_push($courseIds, $course->id);
+        }
+
+        return $courseIds;
+    }
+
+
+    public static function getCourses($courseIds){
+        
+        $courses = [];
+
+        foreach($courseIds as $courseId) {
+           $course = self::where('id', '=', $courseId)->first();
+           array_push($courses, $course);
+        }
+
+        return $courses;
+    }
+
+    public static function getCoursesByCodes($courseCodes){
+        
+        $courses = [];
+
+        foreach($courseCodes as $courseCode) {
+           $course = self::where('courseCode', '=', $courseCode)->first();
+           array_push($courses, $course);
+        }
+
+        return $courses;
+    }
 }
