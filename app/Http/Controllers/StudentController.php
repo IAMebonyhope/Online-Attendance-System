@@ -13,7 +13,7 @@ use Hash;
 class StudentController extends Controller
 {
     public function getLogin(){
-        return view('index');
+        return view('student.login');
     }
 
 
@@ -26,7 +26,7 @@ class StudentController extends Controller
         //retrieve student with that matric No from the cits databse
         $student = CitsStudent::where('matricNo', '=', Request('matricNo'))->first();
 
-        if(($student != null)){
+        if(($student != null) && ($this->validatePassword(Request('password'), $student->password)== true)){
             $courseIds = Course::getCourseIds(explode(',', $student->courses));
             session([
                 'matricNo' => request()->input('matricNo'),
@@ -35,7 +35,7 @@ class StudentController extends Controller
 
             $courses = Course::getCourses($courseIds);
 
-            return view('register', compact('courses', 'student'));
+            return view('student.register', compact('courses', 'student'));
         }
         else{
             session()->flash('incorrectDetails', 'Incorrect Password or Matric No');
@@ -43,7 +43,7 @@ class StudentController extends Controller
         }
     }
 
-    public function postRegister(){
+    public function Register(){
 
         $student = Student::where([
                 ['matricNo', '=', session('matricNo')],
@@ -63,15 +63,15 @@ class StudentController extends Controller
                         'matricNo' => session('matricNo'),
                         'courses' => json_encode($courses),
                     ]); 
-            dd($student->courses);
-            session()->flash('RegistrationSuccessful', 'You have successfully registered on this platform');   
+            //dd($student->courses);
+            session()->flash('registrationSuccessful', 'You have successfully registered on this platform');   
 
             return redirect('/');
         }
         else{
-            session()->flash('RegistrationError', 'This student has registered before');
+            session()->flash('registrationError', 'This student has registered before');
 
-            return redirect('student/register');
+            return redirect('student/login');
         }
     }
 

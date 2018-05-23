@@ -31,8 +31,8 @@ class UserController extends Controller
             $coursesCodes = $this->getCoursesCodes($citsStaff->dept);
             if($coursesCodes != null){
                 $courses = Course::getCoursesByCodes($coursesCodes);
-                dd($courses);
-                return view('register', compact('citsStaff', 'courses'));
+                //dd($courses);
+                return view('lecturer.register', compact('citsStaff', 'courses'));
             }
         }
         else{
@@ -44,10 +44,10 @@ class UserController extends Controller
     public function postRegister(){
 
         $this->validate(request(), [
-            'courses' => 'required|array|min:1',     
+            'newCourses' => 'required|array|min:1',     
         ]);
 
-        $courses = implode(',', Request('courses'));
+        $courses = implode(',', Request('newCourses'));
         $citsStaff = Auth::guard()->user();
 
         $staff = User::create([

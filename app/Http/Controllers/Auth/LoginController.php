@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = 'staff/register';
+    protected $redirectTo = 'lecturer/register';
 
     /**
      * Create a new controller instance.
@@ -39,7 +39,7 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('lecturer.login');
     }
 
     public function redirectPath()
@@ -48,7 +48,7 @@ class LoginController extends Controller
             return $this->redirectTo();
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : 'staff/register';
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : 'lecturer/register';
     }
 
     public function username()
@@ -62,6 +62,6 @@ class LoginController extends Controller
 
         $request->session()->invalidate();
 
-        return redirect('staff/login');
+        return redirect('lecturer/login');
     }
 }

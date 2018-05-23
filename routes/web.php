@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 })->name('home');
 
 
@@ -20,42 +20,42 @@ Route::group(['prefix' => 'student'], function () {
 
     Route::get('login', [
         'uses' => 'StudentController@getLogin',
-        'as' => 'get-login'
+        'as' => 'get-student-login'
     ]);
 
     Route::post('login', [
         'uses' => 'StudentController@postLogin',
-        'as' => 'login'
+        'as' => 'student-login'
     ]);
 
-    Route::post('register', [
-        'uses' => 'StudentController@postRegister',
-        'as' => 'register'
+    Route::get('register', [
+        'uses' => 'StudentController@Register',
+        'as' => 'student-register'
     ]);
 
 });
 
 
-Route::group(['prefix' => 'staff'], function () {
+Route::group(['prefix' => 'lecturer'], function () {
 
     Route::get('login', [
         'uses' => 'Auth\LoginController@showLoginForm',
-        'as' => 'get-login'
+        'as' => 'get-staff-login'
     ]);
 
     Route::post('login', [
         'uses' => 'Auth\LoginController@login',
-        'as' => 'login'
+        'as' => 'staff-login'
     ]);
 
     Route::get('register', [
         'uses' => 'userController@getRegister',
-        'as' => 'get-register'
+        'as' => 'get-staff-register'
     ]);
 
     Route::post('register', [
         'uses' => 'userController@postRegister',
-        'as' => 'register'
+        'as' => 'staff-register'
     ]);
 
     Route::get('dashboard', [
@@ -79,7 +79,7 @@ Route::group(['prefix' => 'staff'], function () {
     ]);
 
     Route::get('dashboard/courses/{id}', [
-        'uses' => 'CourseController@show',
+        'uses' => 'CourseController@read',
         'as' => 'course-show'
     ]);
 
@@ -87,6 +87,22 @@ Route::group(['prefix' => 'staff'], function () {
         'uses' => 'CourseController@delete',
         'as' => 'course-delete'
     ]);
+
+    Route::get('dashboard/courses/{courseId}/attendance/new', [
+        'uses' => 'AttendanceController@getCreate',
+        'as' => 'create-new-att'
+    ]);
+
+    Route::post('dashboard/courses/{courseId}/attendance/new', [
+        'uses' => 'AttendanceController@postCreate',
+        'as' => 'save-new-att'
+    ]);
+
+    Route::get('dashboard/courses/{courseId}/attendance/{attId}', [
+        'uses' => 'AttendanceController@read',
+        'as' => 'att-show'
+    ]);
+    
 
 });
 

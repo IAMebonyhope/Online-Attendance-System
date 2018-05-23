@@ -58,7 +58,9 @@ class Course extends Authenticatable
 
         foreach($courseCodes as $courseCode) {
            $course = self::where('courseCode', '=', $courseCode)->first();
-           array_push($courses, $course);
+           if($course != null){
+                array_push($courses, $course);
+           }
         }
 
         return $courses;
