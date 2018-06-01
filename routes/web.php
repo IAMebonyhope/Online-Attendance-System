@@ -68,6 +68,16 @@ Route::group(['prefix' => 'lecturer'], function () {
         'as' => 'dashboard'
     ]);
 
+    Route::get('dashboard/courses', [
+        'uses' => 'userController@courses',
+        'as' => 'courses-for-new'
+    ]);
+
+    Route::get('dashboard/courses/view', [
+        'uses' => 'userController@viewCourses',
+        'as' => 'view-courses'
+    ]);
+
     Route::get('dashboard/courses/new', [
         'uses' => 'CourseController@getCreate',
         'as' => 'create-new-course'
@@ -98,9 +108,19 @@ Route::group(['prefix' => 'lecturer'], function () {
         'as' => 'save-new-att'
     ]);
 
+    Route::get('dashboard/courses/{courseId}/attendance/all', [
+        'uses' => 'AttendanceController@readAll',
+        'as' => 'course-att-all'
+    ]);
+
     Route::get('dashboard/courses/{courseId}/attendance/{attId}', [
         'uses' => 'AttendanceController@read',
-        'as' => 'att-show'
+        'as' => 'course-att-show'
+    ]);
+
+    Route::get('logout', [
+        'uses' => 'Auth\LoginController@logout',
+        'as' => 'staff-logout'
     ]);
     
 

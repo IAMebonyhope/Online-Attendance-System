@@ -31,7 +31,14 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 <link href="//fonts.googleapis.com/css?family=Montserrat+Alternates:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic" rel="stylesheet">
 <!-- //fonts -->
-
+<style>
+h1{
+	font-family: cambria;
+    color: white;
+    text-align: center;
+    font-size: 60px;
+}
+</style>
 
 
 
@@ -66,14 +73,15 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 						<strong>Success!</strong> {{ session('registrationSuccessful')}}
 					</div>
 			@endif
-						<ul class="nav navbar-nav">
+						<!--<ul class="nav navbar-nav">
 							<li class="active"><a href="{{ route('home')}}">Home</a></li>
 							<li><a href="#about" class="scroll">About</a></li>
 							<li><a href="#services" class="scroll">Services</a></li>
 							<li><a href="#gallery" class="scroll">gallery</a></li>
 							<li><a href="#professor" class="scroll">professors</a></li>
 							<li><a href="#contact" class="scroll">Contact</a></li>
-						</ul>
+						</ul>-->
+						<h1>ONLINE ATTENDANCE SYSTEM</h1>
 					</nav>
 				</div>
 				</div>
@@ -84,6 +92,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 </section>	
 
 <div id="about" class="about slider-banner space" style="padding-top: 20%; padding-bottom: 5%">
+	
 	
 	<div class="container">
 			

@@ -11,7 +11,7 @@ use App\CitsStaff;
 use App\CitsStudent;
 use Auth;
 
-class UserController extends Controller
+class CourseController extends Controller
 {
     public function __construct()
     {
@@ -19,7 +19,7 @@ class UserController extends Controller
     }
 
 
-    public function getCreate($id){
+    public function getCreate(){
 
         $citsStaff = Auth::guard()->user();
         $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
@@ -35,12 +35,11 @@ class UserController extends Controller
             $coursesCodes = $this->getCoursesCodes($citsStaff->dept);
             if($coursesCodes != null){
                 $courses = Course::getCoursesByCodes($coursesCodes);
-                dd($courses);
-                return view('course.new', compact('citsStaff', 'courses'));
+                return view('lecturer.course.new', compact('citsStaff', 'courses'));
             }
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
         }
     }
 
@@ -62,40 +61,47 @@ class UserController extends Controller
             $staff->courses = implode(',',$courses);
             $staff->save();
 
-            return redirect('staff/dashboard');
+            return redirect('lecturer/dashboard');
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
         }
 
     }
 
     //read aggregate of attandance for the course id;
     public function read($id){
+
         //get all students
         //loop through all student
             //loop through the courses they are taking
             //if course with id = $id is found 
             //add the students to the array
         //pass the array to the view
+        $course = Course::find($id);
         $students = Student::all();
         $count = Attendance::where('courseId', '=', $id)->get()->count();
+        if($count == 0){
+            $count = 1;
+        }
 
         $courseStudents = [];
         foreach($students as $student){ 
-            $courses = unserialize($student->courses);
-            if (array_key_exists($id, $courses)) {
-                $st = CitsStudent::where('matricNo', '=', $student->matricNo);
+            $courses = json_decode($student->courses, true);
+            if(array_key_exists($id, $courses)) {
+                $st = CitsStudent::where('matricNo', '=', $student->matricNo)->first();
                 $student->name = $st->surname. " " . $st->firstName. " " . $st->otherName;
-                $x = $student->course[$id];
-                $student->percent = ($x / $count) * 100;
+                $x = $courses[$id];
+                if($x == 0){
+                    $x = 1;
+                }
+                $student->percent = ceil(($x / $count) * 100);
 
                 array_push($courseStudents, $student);
             }
 
         }
-
-        return view('course.read', compact('courseStudents'));
+        return view('lecturer.attendance.aggregate', compact('courseStudents', 'course'));
 
     }
 
@@ -122,10 +128,10 @@ class UserController extends Controller
             $staff->courses = implode(',',$courses);
             $staff->save();
 
-            return redirect('staff/dashboard');
+            return redirect('lecturer/dashboard');
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
         }
     }
 

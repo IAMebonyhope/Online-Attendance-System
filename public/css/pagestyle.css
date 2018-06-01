@@ -1334,6 +1334,7 @@ section#tables  p {
 
 .form-body {
     padding: 1.5em 2em;
+    text-align: left;
 }
 .inline-form .form-group,.inline-form .checkbox, .form-two .form-group{
     margin-right: 1em;

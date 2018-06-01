@@ -7,7 +7,7 @@ use App\User;
 use App\Course;
 use App\Student;
 use App\Attendance;
-use App\CitsStaff;
+use App\CitsLecturer;
 use App\CitsStudent;
 use Auth;
 
@@ -25,24 +25,33 @@ class AttendanceController extends Controller
 
         if(($citsStaff != null) && ($staff != null)){
 
-            $course = Course::where('courseId', '=', $courseId)->first();
-            $count = Attendance::where('courseId', '=', $id)->get()->count();
+            $course = Course::where('id', '=', $courseId)->first();
+            $count = Attendance::where('courseId', '=', $courseId)->get()->count();
+            $course->lect = $count + 1;
+            if($count == 0){
+                $count = 1;
+            }
             $students = [];
 
             $allStudents = Student::all();
             foreach ($allStudents as $st) {
-                $courses = unserialize($st->courses);
+                $courses = json_decode($st->courses, true);
                 if (array_key_exists($courseId, $courses)) {
-                    $student = CitsStudent::where('matricNo', '=', $st->matricNo);
+                    $student = CitsStudent::where('matricNo', '=', $st->matricNo)->first();
                     $st->name = $student->surname. " " . $student->firstName. " " . $student->otherName;
-                    $x = $st->courses[$courseId];
-                    $st->percent = ($x / $count) * 100;
+                    $st->level = $student->level;
+                    $x = $courses[$courseId];
+                    $st->count = $x + 1;
+                    if($x == 0){
+                        $x = 1;
+                    }
+                    $st->percent = ceil(($x / $count) * 100);
 
                     array_push($students, $st);
                 }
             }
 
-            return view('attendance.new', compact('students', 'course'));
+            return view('lecturer.attendance.new.create', compact('students', 'course'));
         }
         else{
             return redirect('staff/login');
@@ -60,7 +69,7 @@ class AttendanceController extends Controller
         $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
 
         if(($citsStaff != null) && ($staff != null)){
-            $course = Course::where('courseId', '=', $courseId)->first();
+            $course = Course::where('id', '=', $courseId)->first();
             $studentIds = Request('students');
 
             $attendance = Attendance::create([
@@ -71,17 +80,39 @@ class AttendanceController extends Controller
 
             foreach ($studentIds as $studentId) {
                 $student = Student::where('id', '=', $studentId)->first();
-                $courses = unserialize($student->courses);
+                $courses = json_decode($student->courses, true);
                 if (array_key_exists($courseId, $courses)) {
-                    $student->courses[$courseId] += 1;
-                    $student-save();
+                    $courses[$courseId] = $courses[$courseId] + 1;
+                    $student->courses = json_encode($courses);
+                    $student->save();
                 }
             }
 
-            return redirect('staff/dashboard');
+            return redirect('lecturer/dashboard');
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
+        }
+    }
+
+    public function readAll($courseId){
+        $citsStaff = Auth::guard()->user();
+        $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
+
+        if(($citsStaff != null) && ($staff != null)){
+            $course = Course::where('id', '=', $courseId)->first();
+            $attendances = Attendance::where('courseId', '=', $courseId)->get();
+
+            foreach ($attendances as $attendance) {
+                $lect = CitsLecturer::where('id', '=', $attendance->staffId)->first();
+                $attendance->lect = $lect->surname. " " . $lect->firstName;
+                $attendance->students = count(explode(',', $attendance->students));
+            }
+            
+            return view('lecturer.attendance.allCourseAtt', compact('attendances', 'course'));
+        }
+        else{
+            return redirect('lecturer/login');
         }
     }
 
@@ -91,31 +122,36 @@ class AttendanceController extends Controller
         $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
 
         if(($citsStaff != null) && ($staff != null)){
-            $course = Course::where('courseId', '=', $courseId)->first();
+            $course = Course::where('id', '=', $courseId)->first();
             $attendance = Attendance::where('id', '=', $attId)->first();
+            $course->attDate = $attendance->created_at;
             $students = [];
-            $sts = explode(',', $attendance->students);
 
-            $allStudents = Student::all();
-            foreach ($allStudents as $st) {
-                $courses = unserialize($st->courses);
-                if (array_key_exists($courseId, $courses)) {
-                    $student = CitsStudent::where('matricNo', '=', $st->matricNo);
-                    $st->name = $student->surname. " " . $student->firstName. " " . $student->otherName;
-                    if(in_array($st->id, $sts)){
-                        $st->present = true;
+            if($attendance != null){
+                $sts = explode(',', $attendance->students);
+
+                $allStudents = Student::all();
+                foreach ($allStudents as $st) {
+                    $courses = json_decode($st->courses, true);
+                    if (array_key_exists($courseId, $courses)) {
+                        $student = CitsStudent::where('matricNo', '=', $st->matricNo)->first();
+                        $st->name = $student->surname. " " . $student->firstName. " " . $student->otherName;
+                        if(in_array($st->id, $sts)){
+                            $st->present = true;
+                        }
+                        else{
+                            $st->present = false;
+                        }
+                        array_push($students, $st);
                     }
-                    else{
-                        $st->present = false;
-                    }
-                    array_push($students, $st);
                 }
             }
 
-            return view('attendance.read', compact('students', 'course'));
+            return view('lecturer.attendance.showAtt', compact('students', 'course'));
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
         }
     }
+
 }

@@ -36,7 +36,7 @@ class UserController extends Controller
             }
         }
         else{
-            return redirect('staff/dashboard');
+            return redirect('lecturer/dashboard');
         }
     }
 
@@ -47,14 +47,26 @@ class UserController extends Controller
             'newCourses' => 'required|array|min:1',     
         ]);
 
-        $courses = implode(',', Request('newCourses'));
         $citsStaff = Auth::guard()->user();
 
-        $staff = User::create([
-                        'staffId' => $citsStaff->staffId,
-                        'courses' => $courses,
-                    ]); 
-        dd($staff);
+        $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
+
+        if($staff == null){
+            $courses = implode(',', Request('newCourses'));
+            $citsStaff = Auth::guard()->user();
+
+            $staff = User::create([
+                            'staffId' => $citsStaff->staffId,
+                            'courses' => $courses,
+                        ]);
+
+            session()->flash('registrationSuccessful', 'You have successfully registered on this platform');   
+
+            return redirect('lecturer/dashboard');
+        }
+        else{
+            return redirect('lecturer/dashboard');
+        }
     }
 
 
@@ -63,13 +75,45 @@ class UserController extends Controller
         $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
 
         if($staff != null){
-            $courseIds = $staff->courses;
+            $courseIds = explode(',', $staff->courses);
             $courses = Course::getCourses($courseIds);
-            dd($courses);
-            return view('dashboard', compact('courses'));
+
+            return view('lecturer.dashboard', compact('courses'));
         }
         else{
-            return redirect('staff/login');
+            return redirect('lecturer/login');
+        }
+    }
+
+
+    public function courses(){
+        $citsStaff = Auth::guard()->user();
+        $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
+
+        if($staff != null){
+            $courseIds = explode(',', $staff->courses);
+            $courses = Course::getCourses($courseIds);
+
+            return view('lecturer.attendance.new.allCourses', compact('courses'));
+        }
+        else{
+            return redirect('lecturer/login');
+        }
+    }
+
+
+    public function viewCourses(){
+        $citsStaff = Auth::guard()->user();
+        $staff = User::where('staffId', '=', $citsStaff->staffId)->first();
+
+        if($staff != null){
+            $courseIds = explode(',', $staff->courses);
+            $courses = Course::getCourses($courseIds);
+
+            return view('lecturer.attendance.allAtt', compact('courses'));
+        }
+        else{
+            return redirect('lecturer/login');
         }
     }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Attendance System</title>
+<title>Online Attendance Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="keywords" content="Novus Admin Panel Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
@@ -47,16 +47,26 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
             <div class="navbar-collapse">
 				<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
 					<ul class="nav" id="side-menu">
-						<li>
-							<a href="#"><i class="fa fa-home nav_icon"></i>Complaint</a>
-						</li>
+				
 						
 						<li>
-							<a href="#"><i class="fa fa-check-square-o nav_icon"></i>Registration<span class="fa arrow"></span></a>
-						</li>
+							<a href="{{ route('dashboard') }}"><i class="fa fa-check-square-o nav_icon "></i>All courses<span class="fa arrow"></span></a>
+                        </li>
+                        
+                        <li>
+                            <a href="{{ route('create-new-course') }}"><i class="fa fa-home nav_icon"></i>Add new course</a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('view-courses') }}"><i class="fa fa-home nav_icon"></i>View attendances</a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('courses-for-new') }}"><i class="fa fa-home nav_icon"></i>Add new attendance</a>
+                        </li>
 
 						<li>
-							<a href="http://studentportal.unilag.edu.ng"><i class="fa fa-home nav_icon"></i>Back to School Website</a>
+							<a href="{{ route('staff-logout') }}"><i class="fa fa-home nav_icon"></i>Logout</a>
 						</li>
 
 						
@@ -81,8 +91,7 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 				</div>
 				<!--//logo-->
 				<!--search-box-->
-				<div class="search-box">
-				</div><!--//end-search-box-->
+				
 				<div class="clearfix"> </div>
 			</div>
 			
@@ -108,82 +117,54 @@ SmartPhone Compatible web template, free WebDesigns for Nokia, Samsung, LG, Sony
 		<!-- main content start-->
 		<div id="page-wrapper">
 			<div class="main-page">
-				<div class="forms">
-					<h3 class="title1 middle">LECTURER REGISTRATION</h3>
-					<div class="form-grids row widget-shadow" data-example-id="basic-forms"> 
-						<div class="form-title">
-							<h4 class="middle">DETAILS</h4>
-						</div>
-						<div class="form-body table-responsive">
-							<table class="table">
-								<tbody>
-									<tr>
-										<td>NAME</td>
-										<td>{{$citsStaff->surname . " " . $citsStaff->firstName}}</td>
-									</tr>
-									<tr>
-										<td>STAFF ID</td>
-										<td>{{$citsStaff->staffId}}</td>
-									</tr>
-									<tr>
-										<td>DEPARTMENT</td>
-										<td>{{$citsStaff->dept}}</td>
-									</tr>
-									<tr>
-										<td>FACULTY</td>
-										<td>{{$citsStaff->faculty}}</td>
-									</tr>
-									<tr>
-										<td>PHONE</td>
-										<td>{{$citsStaff->phoneNo}}</td>
-									</tr>
-									<tr>
-										<td>EMAIL</td>
-										<td>{{$citsStaff->email}}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div class="form-title">
-							<h4 class="middle">COURSES</h4>
-						</div>
-						<div class="form-body table-responsive">
-							
-							<form action="{{route('staff-register')}}" method="post">
-								{{ csrf_field() }}
-								<table class="table">
-									<thead>
-										<th></th>
-										<th>COURSE CODE</th>
-										<th>COURSE NAME</th>
-									</thead>
-									<tbody>
-										@foreach($courses as $course)
-										<tr>
-											<td><input type="checkbox" name="newCourses[]" value="{{$course->id}}"></td>
-											<td>{{$course->courseCode}}</td>
-											<td>{{$course->courseName}}</td>
-										</tr>
-										@endforeach
-									</tbody>
-								</table>
-								<br>
-									@if ($errors->has('newCourses'))
-										<span class="help-block">
-											<strong>{{ $errors->first('newCourses') }}</strong>
-										</span>
-									@endif
-								<br>
-								<input type="submit" class="btn form-control" value="SUBMIT">
-							</form>
-							
-						</div>
+			<div class="forms">
+                <div class="form-grids row widget-shadow" data-example-id="basic-forms"><div class="form-title">
+						<h4 >COURSE CODE:       {{$course->courseCode}}</h4><br>
+						<h4 >COURSE TITLE:       {{$course->courseName}}</h4><br>
+						<h4 >LECTURE:      {{$course->lect}}</h4><br>
+						
+						
+                    </div>
+                    <div class="form-body table-responsive">
+						<form action="{{route('save-new-att', $course->id)}}" method="post">
+							{{ csrf_field() }}
+                        <table class="table">
+                            <thead >
+								<th>MATRIC NO </th>
+								<th>LEVEL </th>
+								<th>FULLNAME</th>
+								<th>ATTENDANCE</th>
+								<th>PERCENTAGE</th>
+								<th>CHECK(S)</th>
+                            </thead>
+                            <tbody>
+								@foreach($students as $student)
+                                <tr>
+                                    <td>{{$student->matricNo}}</td>
+									<td>{{$student->level}}</td>
+									<td>{{$student->name}}</td>
+									<td>{{$student->count}} of {{$course->lect}}</td>
+									<td>{{$student->percent}}%</td>
+                                    <td><input type="checkbox" name="students[]" value="{{$student->id}}" ></td>
+                                    
+                                </tr>     
+                                @endforeach
+							</tbody>
+						</table>
+						@if ($errors->has('students'))
+												<span class="help-block">
+													<strong>{{ $errors->first('students') }}</strong>
+												</span>
+											@endif
+										<br>
+										<input type="submit" class="btn form-control" value="SUBMIT">
+					</form>	
+                            
+                        </div> 
 					</div>
 					
-					
-		</div>
-
-	</div>
+                        
+    </div>
 	<!-- Classie -->
 		<script src="js/classie.js"></script>
 		<script>
